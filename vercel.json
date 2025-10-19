@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "app/api/generate-qr/index.py": {
+      "excludeFiles": "{.next,.git,node_modules,.claude}/**"
+    }
+  },
+      "buildCommand": "pnpm build",
+  "installCommand": "pnpm install",
+    "devCommand": "pnpm dev"
+}

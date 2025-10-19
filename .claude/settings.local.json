@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm install)",
+      "Bash(pnpm test)",
+      "Bash(pnpm start)",
+      "WebSearch",
+      "WebFetch(domain:pyodide.org)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:pypi.org)",
+      "WebFetch(domain:pillow.readthedocs.io)",
+      "Bash(pnpm dlx shadcn@latest add:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm dev)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "Bash(vercel deploy:*)",
+      "Bash(vercel:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_install",
+      "mcp__browser-tools__runAuditMode",
+      "mcp__browser-tools__runAccessibilityAudit",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_type",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_handle_dialog",
+      "mcp__playwright__browser_network_requests",
+      "mcp__playwright__browser_take_screenshot",
+      "Bash(python:*)",
+      "Bash(curl:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
