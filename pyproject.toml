@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.119.0",
+    "legacy-cgi>=2.6.3",
     "pillow>=12.0.0",
     "python-multipart>=0.0.20",
     "qrcode-artistic>=3.0.2",
