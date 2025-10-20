@@ -3,11 +3,6 @@
 
   inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0";
 
-  inputs.pre-commit-hooks = {
-    url = "github:cachix/git-hooks.nix";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
-
   outputs =
     {
       self,
@@ -32,27 +27,6 @@
         );
     in
     {
-      checks = forEachSupportedSystem (
-        {
-          system,
-          pkgs,
-        }:
-        {
-          pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
-            src = ./.;
-            hooks = {
-              ruff = {
-                enable = true;
-              };
-              ruff-format = {
-                enable = true;
-              };
-              # selene.enable = true;
-            };
-          };
-        }
-      );
-
       devShells = forEachSupportedSystem (
         {
           system,
@@ -68,9 +42,7 @@ nodePackages.vercel
             shellHook = ''
               source .venv/bin/activate
               python --version
-              ${self.checks.${system}.pre-commit-check.shellHook}
             '';
-            buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
           };
         }
       );
