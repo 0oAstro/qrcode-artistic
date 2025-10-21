@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Dithering } from "@paper-design/shaders-react"
+import { Download, Copy } from "lucide-react"
 
 interface GeneratedQR {
   url: string
@@ -17,6 +18,8 @@ export function PixelQrGenerator() {
   const [image1, setImage1] = useState<File | null>(null)
   const [image1Preview, setImage1Preview] = useState<string>("")
   const [image1Url, setImage1Url] = useState<string>("")
+  const [imageUrlInput, setImageUrlInput] = useState<string>("")
+  const scale = 48 // Fixed scale value
     const [isLoading, setIsLoading] = useState(false)
   const [isConvertingHeic, setIsConvertingHeic] = useState(false)
   const [heicProgress, setHeicProgress] = useState(0)
@@ -24,7 +27,7 @@ export function PixelQrGenerator() {
   const [showAnimation, setShowAnimation] = useState(false)
   const [progress, setProgress] = useState(0)
   const [imageLoaded, setImageLoaded] = useState(false)
-  const [qrContent, setQrContent] = useState("https://example.com")
+  const [qrContent, setQrContent] = useState("")
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null)
   
   const showToast = (message: string, type: "success" | "error" = "success") => {
@@ -82,10 +85,11 @@ export function PixelQrGenerator() {
 
     document.addEventListener("paste", handlePaste)
     return () => document.removeEventListener("paste", handlePaste)
-  }, [image1, image1Url])
+  }, [image1])
 
 
 
+  
   const convertHeicToPng = async (file: File): Promise<File> => {
     try {
       setHeicProgress(0)
@@ -158,6 +162,7 @@ export function PixelQrGenerator() {
       }
     }
 
+  
     const reader = new FileReader()
     reader.onload = (e) => {
       const result = e.target?.result as string
@@ -206,6 +211,16 @@ export function PixelQrGenerator() {
     setImage1(null)
   }
 
+  const handleImageUrlChange = (url: string) => {
+    console.log("[v0] Image URL changed:", url)
+    setImageUrlInput(url)
+    if (url.trim()) {
+      setImage1Url(url)
+      setImage1Preview(url)
+      setImage1(null)
+    }
+  }
+
 
 
   const generateQrCode = async () => {
@@ -238,16 +253,18 @@ export function PixelQrGenerator() {
     try {
       const formData = new FormData()
       formData.append("url", qrContent)
+      formData.append("scale", scale.toString())
 
       if (image1Url) {
-        formData.append("image", image1Url)
+        formData.append("background_url", image1Url)
       } else {
         if (image1) {
           formData.append("image", image1)
         }
       }
 
-      const response = await fetch("/api/generate-qr", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+      const response = await fetch(`${apiUrl}/generate-qr`, {
         method: "POST",
         body: formData,
       })
@@ -266,7 +283,12 @@ export function PixelQrGenerator() {
 
       setImageLoaded(true)
 
-      setGeneratedQR(data)
+      // Add cache-busting parameter to prevent browser from showing cached images
+      const cacheBustingData = {
+        ...data,
+        url: data.url.includes('#') ? data.url : `${data.url}#cb=${Date.now()}`
+      }
+      setGeneratedQR(cacheBustingData)
       setIsLoading(false)
       setShowAnimation(false)
       setProgress(0)
@@ -310,15 +332,7 @@ export function PixelQrGenerator() {
         // Ensure window is focused
         window.focus()
 
-        // Try direct fetch first (works in development), fallback to proxy
-        let response
-        try {
-          response = await fetch(generatedQR.url, { mode: "cors" })
-        } catch {
-          // Fallback to proxy for production CORS issues
-          const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(generatedQR.url)}`
-          response = await fetch(proxyUrl)
-        }
+        const response = await fetch(generatedQR.url, { mode: "cors" })
 
         if (!response.ok) {
           throw new Error("Failed to fetch QR code")
@@ -345,6 +359,7 @@ export function PixelQrGenerator() {
     setImage1(null)
     setImage1Preview("")
     setImage1Url("")
+    setImageUrlInput("")
   }
 
 
@@ -395,7 +410,7 @@ export function PixelQrGenerator() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12m0 0l-3-3m0 0l-3 3m3-3v12"
+                    d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
               )}
@@ -410,7 +425,7 @@ export function PixelQrGenerator() {
       <div className="fixed inset-0 z-0 select-none">
         <Dithering
           colorBack="#00000000"
-          colorFront="#FFFFFF"
+          colorFront="#4a5568"
           speed={0.43}
           shape="wave"
           type="4x4"
@@ -466,7 +481,7 @@ export function PixelQrGenerator() {
                     userSelect: "text",
                   }}
                 />
-              </div>
+                </div>
 
               <div className="space-y-3 md:space-y-6">
                 <div>
@@ -474,8 +489,30 @@ export function PixelQrGenerator() {
                     <label className="text-xs md:text-sm font-medium text-gray-300">Background Image</label>
                                       </div>
 
-                                      <div className="space-y-2 select-none" style={{ minHeight: "80px" }}>
-                      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:flex lg:justify-start lg:gap-4">
+                                      <div className="space-y-4 select-none" style={{ minHeight: "80px" }}>
+                      <div>
+                        <label className="text-xs text-gray-400 block mb-2">Enter image URL:</label>
+                        <input
+                          type="text"
+                          value={imageUrlInput}
+                          onChange={(e) => handleImageUrlChange(e.target.value)}
+                          placeholder="https://example.com/image.jpg"
+                          className="w-full h-10 p-2 bg-black/50 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-white text-white text-xs"
+                        />
+                      </div>
+
+                      <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                          <div className="w-full border-t border-gray-600"></div>
+                        </div>
+                        <div className="relative flex justify-center text-xs">
+                          <span className="bg-black/70 px-2 text-gray-400">or</span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs text-gray-400 block mb-2">Upload background image:</label>
+                        <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:flex lg:justify-start lg:gap-4">
                         <div
                           className={cn(
                             "w-full h-[60px] sm:h-[80px] lg:w-[140px] lg:h-[120px] lg:flex-shrink-0 border border-gray-600 rounded flex items-center justify-center cursor-pointer hover:border-white transition-all bg-black/30 relative",
@@ -536,6 +573,7 @@ export function PixelQrGenerator() {
                             onChange={(e) => handleFileSelect(e)}
                           />
                         </div>
+                        </div>
                       </div>
                     </div>
                 </div>
@@ -575,29 +613,29 @@ export function PixelQrGenerator() {
                 </h3>
                 {generatedQR && (
                   <div className="flex gap-1 md:gap-2">
-
                     <Button
-                      onClick={downloadQR}
+                      onClick={downloadQr}
                       variant="outline"
                       size="sm"
-                      className="text-xs h-7 px-2 bg-transparent border-gray-600 text-white hover:bg-gray-700 flex items-center gap-1"
+                      className="text-xs h-7 px-2 bg-transparent border-gray-600 text-white hover:bg-gray-700"
                       title="Download"
                     >
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                        />
-                      </svg>
-                      <span className="hidden sm:inline">Download</span>
+                      <Download className="w-3 h-3" />
+                    </Button>
+                    <Button
+                      onClick={copyQrToClipboard}
+                      variant="outline"
+                      size="sm"
+                      className="text-xs h-7 px-2 bg-transparent border-gray-600 text-white hover:bg-gray-700"
+                      title="Copy to Clipboard"
+                    >
+                      <Copy className="w-3 h-3" />
                     </Button>
                   </div>
                 )}
               </div>
 
-              <div className="flex items-center justify-center h-48 md:h-80">
+              <div className="flex items-center justify-center h-48 md:h-80 p-2 md:p-4">
                 {isLoading ? (
                   <div className="w-full h-full flex flex-col items-center justify-center px-4 select-none">
                     <div className="w-full max-w-md">
@@ -623,17 +661,17 @@ export function PixelQrGenerator() {
                             backgroundImage: `
                               repeating-linear-gradient(
                                 90deg,
-                                #614B00 0px,
-                                #614B00 6px,
-                                #735B00 6px,
-                                #735B00 8px
+                                #4a5568 0px,
+                                #4a5568 6px,
+                                #2d3748 6px,
+                                #2d3748 8px
                               ),
                               repeating-linear-gradient(
                                 0deg,
-                                #614B00 0px,
-                                #614B00 6px,
-                                #735B00 6px,
-                                #735B00 8px
+                                #4a5568 0px,
+                                #4a5568 6px,
+                                #2d3748 6px,
+                                #2d3748 8px
                               )
                             `,
                             backgroundSize: "8px 8px",
@@ -666,17 +704,17 @@ export function PixelQrGenerator() {
                             backgroundImage: `
                               repeating-linear-gradient(
                                 90deg,
-                                #614B00 0px,
-                                #614B00 6px,
-                                #735B00 6px,
-                                #735B00 8px
+                                #4a5568 0px,
+                                #4a5568 6px,
+                                #2d3748 6px,
+                                #2d3748 8px
                               ),
                               repeating-linear-gradient(
                                 0deg,
-                                #614B00 0px,
-                                #614B00 6px,
-                                #735B00 6px,
-                                #735B00 8px
+                                #4a5568 0px,
+                                #4a5568 6px,
+                                #2d3748 6px,
+                                #2d3748 8px
                               )
                             `,
                             backgroundSize: "8px 8px",
@@ -697,26 +735,26 @@ export function PixelQrGenerator() {
                     </div>
                   </div>
                 ) : generatedQR ? (
-                  <div className="w-full h-full flex flex-col select-none">
-                    <div className="flex-1 flex items-center justify-center max-h-36 md:max-h-64 relative group">
-                      <img
-                        src={generatedQR.url || "/placeholder.svg"}
-                        alt="Generated"
-                        className={`max-w-full max-h-full object-contain rounded transition-opacity duration-500 ${
-                          imageLoaded ? "opacity-100" : "opacity-0"
-                        }`}
-                        style={{
-                          transform: imageLoaded ? "scale(1)" : "scale(1.05)",
-                          transition: "opacity 0.5s ease-out, transform 0.5s ease-out",
-                        }}
-                      />
+                  <div className="w-full h-full flex flex-col select-none p-2 md:p-4">
+                    <div className="flex-1 flex items-center justify-center relative group">
+                      <div className="p-2 md:p-4 bg-white/5 rounded-lg border border-gray-700/30 w-full h-full flex items-center justify-center overflow-hidden">
+                        <img
+                          src={generatedQR.url || "/placeholder.svg"}
+                          alt="Generated"
+                          className={`max-w-full max-h-full object-contain rounded transition-opacity duration-500 ${
+                            imageLoaded ? "opacity-100" : "opacity-0"
+                          }`}
+                          style={{
+                            transform: imageLoaded ? "scale(1)" : "scale(1.05)",
+                            transition: "opacity 0.5s ease-out, transform 0.5s ease-out",
+                            maxHeight: "120px",
+                            maxWidth: "120px",
+                          }}
+                          className="sm:max-h-[140px] sm:max-w-[140px] md:max-h-[200px] md:max-w-[200px] lg:max-h-[280px] lg:max-w-[280px]"
+                        />
+                      </div>
                     </div>
-                    <div className="mt-2 md:mt-4 p-2 md:p-3 bg-black/50 border border-gray-600 rounded">
-                      <p className="text-xs md:text-sm text-gray-300">
-                        <span className="font-semibold text-white">QR Content:</span> {qrContent}
-                      </p>
                     </div>
-                  </div>
                 ) : (
                   <div className="text-center py-6 select-none">
                     <div className="w-8 h-8 md:w-16 md:h-16 mx-auto mb-3 border border-gray-600 rounded flex items-center justify-center bg-black/50">

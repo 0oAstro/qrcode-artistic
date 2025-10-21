@@ -27,7 +27,13 @@
       "mcp__playwright__browser_network_requests",
       "mcp__playwright__browser_take_screenshot",
       "Bash(python:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "WebFetch(domain:vercel.com)",
+      "Bash(timeout:*)",
+      "Bash(uv init:*)",
+      "Bash(uv add:*)",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_file_upload"
     ],
     "deny": [],
     "ask": []
