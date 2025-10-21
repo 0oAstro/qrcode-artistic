@@ -33,7 +33,9 @@
       "Bash(uv init:*)",
       "Bash(uv add:*)",
       "mcp__playwright__browser_snapshot",
-      "mcp__playwright__browser_file_upload"
+      "mcp__playwright__browser_file_upload",
+      "Bash(pnpm build:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

@@ -24,6 +24,7 @@ export function PixelQrGenerator() {
   const [isConvertingHeic, setIsConvertingHeic] = useState(false)
   const [heicProgress, setHeicProgress] = useState(0)
   const [generatedQR, setGeneratedQR] = useState<GeneratedQR | null>(null)
+  const [isDragOver, setIsDragOver] = useState(false)
   const [showAnimation, setShowAnimation] = useState(false)
   const [progress, setProgress] = useState(0)
   const [imageLoaded, setImageLoaded] = useState(false)
@@ -743,14 +744,13 @@ export function PixelQrGenerator() {
                           alt="Generated"
                           className={`max-w-full max-h-full object-contain rounded transition-opacity duration-500 ${
                             imageLoaded ? "opacity-100" : "opacity-0"
-                          }`}
+                          } sm:max-h-[140px] sm:max-w-[140px] md:max-h-[200px] md:max-w-[200px] lg:max-h-[280px] lg:max-w-[280px]`}
                           style={{
                             transform: imageLoaded ? "scale(1)" : "scale(1.05)",
                             transition: "opacity 0.5s ease-out, transform 0.5s ease-out",
                             maxHeight: "120px",
                             maxWidth: "120px",
                           }}
-                          className="sm:max-h-[140px] sm:max-w-[140px] md:max-h-[200px] md:max-w-[200px] lg:max-h-[280px] lg:max-w-[280px]"
                         />
                       </div>
                     </div>
