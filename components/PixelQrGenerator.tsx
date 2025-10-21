@@ -15,6 +15,14 @@ interface GeneratedQR {
 
 
 export function PixelQrGenerator() {
+  // Log environment variables for debugging
+  useEffect(() => {
+    console.log('Environment variables debug:')
+    console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL)
+    console.log('All env vars starting with NEXT_PUBLIC:',
+      Object.keys(process.env).filter(key => key.startsWith('NEXT_PUBLIC_')))
+  }, [])
+
   const [image1, setImage1] = useState<File | null>(null)
   const [image1Preview, setImage1Preview] = useState<string>("")
   const [image1Url, setImage1Url] = useState<string>("")
@@ -265,17 +273,27 @@ export function PixelQrGenerator() {
       }
 
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+      console.log('API URL being used:', apiUrl)
+      console.log('Full API endpoint:', `${apiUrl}/generate-qr`)
+      console.log('Making API call...')
       const response = await fetch(`${apiUrl}/generate-qr`, {
         method: "POST",
         body: formData,
       })
 
+      console.log('Response status:', response.status)
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()))
+
       if (!response.ok) {
+        console.log('Response not OK, parsing error...')
         const errorData = await response.json().catch(() => ({ error: "Unknown error" }))
+        console.log('Error data:', errorData)
         throw new Error(`${errorData.error}${errorData.details ? `: ${errorData.details}` : ""}`)
       }
 
+      console.log('Response OK, parsing JSON...')
       const data = await response.json()
+      console.log('Response data:', data)
       clearInterval(progressInterval)
 
       setProgress(99)

@@ -35,7 +35,11 @@
       "mcp__playwright__browser_snapshot",
       "mcp__playwright__browser_file_upload",
       "Bash(pnpm build:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "WebFetch(domain:qrcode-artistic.onrender.com)",
+      "WebFetch(domain:qrcode-artistic.vercel.app)"
     ],
     "deny": [],
     "ask": []
