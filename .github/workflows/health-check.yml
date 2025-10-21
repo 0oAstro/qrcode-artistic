@@ -1,0 +1,16 @@
+name: Health Check
+
+on:
+  schedule:
+    # Run every 13 minutes (using cron expression)
+    - cron: '*/13 * * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Health Check
+      run: |
+        curl -f https://qrcode-artistic.onrender.com/health || exit 1
