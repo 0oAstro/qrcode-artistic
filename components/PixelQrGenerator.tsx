@@ -3,6 +3,10 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 import { Dithering } from "@paper-design/shaders-react"
 import { Download, Copy } from "lucide-react"
@@ -136,13 +140,13 @@ export function PixelQrGenerator() {
 
       return convertedFile
     } catch (error) {
-      console.error("[v0] HEIC conversion error:", error)
+      console.error("HEIC conversion error:", error)
       throw new Error("Could not convert HEIC image. Please try using a different image format.")
     }
   }
 
   const handleImageUpload = async (file: File) => {
-    console.log("[v0] Uploading image:", file.name)
+    console.log("Uploading image:", file.name)
 
     if (!validateImageFormat(file)) {
       showToast("Please select a valid image file.", "error")
@@ -158,13 +162,13 @@ export function PixelQrGenerator() {
 
     if (isHeic) {
       try {
-        console.log("[v0] Converting HEIC image to JPEG...")
+        console.log("Converting HEIC image to JPEG...")
         setIsConvertingHeic(true)
         processedFile = await convertHeicToPng(file)
-        console.log("[v0] HEIC conversion successful")
+        console.log("HEIC conversion successful")
         setIsConvertingHeic(false)
       } catch (error) {
-        console.error("[v0] Error converting HEIC:", error)
+        console.error("Error converting HEIC:", error)
         setIsConvertingHeic(false)
         showToast("Error converting HEIC image. Please try a different format.", "error")
         return
@@ -175,13 +179,13 @@ export function PixelQrGenerator() {
     const reader = new FileReader()
     reader.onload = (e) => {
       const result = e.target?.result as string
-      console.log("[v0] Image loaded successfully, setting preview")
+      console.log("Image loaded successfully, setting preview")
       setImage1(processedFile) // Use processed file instead of original
       setImage1Preview(result)
-      console.log("[v0] Image 1 preview set:", result.substring(0, 50) + "...")
+      console.log("Image 1 preview set:", result.substring(0, 50) + "...")
     }
     reader.onerror = (error) => {
-      console.error("[v0] Error reading file:", error)
+      console.error("Error reading file:", error)
       showToast("Error reading the image file. Please try again.", "error")
     }
     reader.readAsDataURL(processedFile) // Read processed file instead of original
@@ -190,38 +194,38 @@ export function PixelQrGenerator() {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragOver(false)
-    console.log("[v0] File dropped")
+    console.log("File dropped")
     const file = e.dataTransfer.files[0]
     if (file && file.type.startsWith("image/")) {
-      console.log("[v0] Valid image file dropped:", file.name)
+      console.log("Valid image file dropped:", file.name)
       handleImageUpload(file)
     } else {
-      console.log("[v0] Invalid file type or no file:", file?.type)
+      console.log("Invalid file type or no file:", file?.type)
       showToast("Please drop a valid image file", "error")
     }
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("[v0] File input changed")
+    console.log("File input changed")
     const file = e.target.files?.[0]
     if (file) {
-      console.log("[v0] File selected:", file.name, file.type)
+      console.log("File selected:", file.name, file.type)
       handleImageUpload(file)
       e.target.value = ""
     } else {
-      console.log("[v0] No file selected")
+      console.log("No file selected")
     }
   }
 
   const handleUrlChange = (url: string) => {
-    console.log("[v0] URL changed:", url)
+    console.log("URL changed:", url)
     setImage1Url(url)
     setImage1Preview(url)
     setImage1(null)
   }
 
   const handleImageUrlChange = (url: string) => {
-    console.log("[v0] Image URL changed:", url)
+    console.log("Image URL changed:", url)
     setImageUrlInput(url)
     if (url.trim()) {
       setImage1Url(url)
@@ -443,15 +447,15 @@ export function PixelQrGenerator() {
 
       <div className="fixed inset-0 z-0 select-none">
         <Dithering
-          colorBack="#00000000"
-          colorFront="#4a5568"
+          colorBack="#3D2817"
+          colorFront="#D9A066"
           speed={0.43}
           shape="wave"
           type="4x4"
           pxSize={3}
           scale={1.13}
           style={{
-            backgroundColor: "#000000",
+            backgroundColor: "#3D2817",
             height: "100vh",
             width: "100vw",
           }}
@@ -659,15 +663,15 @@ export function PixelQrGenerator() {
                   <div className="w-full h-full flex flex-col items-center justify-center px-4 select-none">
                     <div className="w-full max-w-md">
                       <div
-                        className="relative h-4 md:h-8 bg-black/50 border border-gray-600 rounded overflow-hidden mb-4"
+                        className="relative h-4 md:h-8 bg-[#3D2817] border border-gray-600 rounded overflow-hidden mb-4"
                         style={{ zIndex: 30 }}
                       >
                         <div
                           className="absolute inset-0 opacity-20"
                           style={{
                             backgroundImage: `
-                              linear-gradient(90deg, transparent 0%, transparent 49%, #333 49%, #333 51%, transparent 51%),
-                              linear-gradient(0deg, transparent 0%, transparent 49%, #333 49%, #333 51%, transparent 51%)
+                              linear-gradient(90deg, transparent 0%, transparent 49%, #D9A066 49%, #D9A066 51%, transparent 51%),
+                              linear-gradient(0deg, transparent 0%, transparent 49%, #D9A066 49%, #D9A066 51%, transparent 51%)
                             `,
                             backgroundSize: "8px 8px",
                           }}
@@ -677,23 +681,7 @@ export function PixelQrGenerator() {
                           className="absolute top-0 left-0 h-full transition-all duration-100 ease-out"
                           style={{
                             width: `${progress}%`,
-                            backgroundImage: `
-                              repeating-linear-gradient(
-                                90deg,
-                                #4a5568 0px,
-                                #4a5568 6px,
-                                #2d3748 6px,
-                                #2d3748 8px
-                              ),
-                              repeating-linear-gradient(
-                                0deg,
-                                #4a5568 0px,
-                                #4a5568 6px,
-                                #2d3748 6px,
-                                #2d3748 8px
-                              )
-                            `,
-                            backgroundSize: "8px 8px",
+                            backgroundColor: "#D9A066",
                           }}
                         />
 
@@ -713,30 +701,14 @@ export function PixelQrGenerator() {
                   <div className="w-full h-full flex flex-col items-center justify-center px-4 select-none">
                     <div className="w-full max-w-md">
                       <div
-                        className="relative h-4 md:h-8 bg-black/50 border border-gray-600 rounded overflow-hidden mb-4"
+                        className="relative h-4 md:h-8 bg-[#3D2817] border border-gray-600 rounded overflow-hidden mb-4"
                         style={{ zIndex: 30 }}
                       >
                         <div
                           className="absolute top-0 left-0 h-full transition-all duration-200 ease-out"
                           style={{
                             width: `${heicProgress}%`,
-                            backgroundImage: `
-                              repeating-linear-gradient(
-                                90deg,
-                                #4a5568 0px,
-                                #4a5568 6px,
-                                #2d3748 6px,
-                                #2d3748 8px
-                              ),
-                              repeating-linear-gradient(
-                                0deg,
-                                #4a5568 0px,
-                                #4a5568 6px,
-                                #2d3748 6px,
-                                #2d3748 8px
-                              )
-                            `,
-                            backgroundSize: "8px 8px",
+                            backgroundColor: "#D9A066",
                           }}
                         />
                         <div className="absolute inset-0 flex items-center justify-center">
@@ -794,26 +766,7 @@ export function PixelQrGenerator() {
             </div>
           </div>
 
-          <div className="mt-4 md:mt-8 pt-3 md:pt-6 border-t border-gray-600/50 select-none">
-            <div className="flex items-center justify-center">
-              <a
-                href="https://v0.app/templates/nano-banana-starter-eTc5ncilekt"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors duration-200 flex items-center gap-2"
-              >
-                <span>open in v0</span>
-                <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
-              </a>
-            </div>
-          </div>
+
         </div>
       </div>
 

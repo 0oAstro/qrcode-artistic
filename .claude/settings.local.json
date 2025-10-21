@@ -39,7 +39,9 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "WebFetch(domain:qrcode-artistic.onrender.com)",
-      "WebFetch(domain:qrcode-artistic.vercel.app)"
+      "WebFetch(domain:qrcode-artistic.vercel.app)",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_evaluate"
     ],
     "deny": [],
     "ask": []

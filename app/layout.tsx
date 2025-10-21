@@ -16,9 +16,31 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "v0 | Nano Banana Starter",
-  description: "Created with v0",
-  generator: "v0.app",
+  title: "Qraft: Artistic QR Code Generator",
+  description: "Create beautiful and artistic QR codes with your own images.",
+  metadataBase: new URL("https://qraft.vercel.app"),
+
+  openGraph: {
+    title: "Qraft: Artistic QR Code Generator",
+    description: "Create beautiful and artistic QR codes with your own images.",
+    url: "https://qraft.vercel.app",
+    siteName: "Qraft",
+    images: [
+      {
+        url: "/logo.png",
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Qraft: Artistic QR Code Generator",
+    description: "Create beautiful and artistic QR codes with your own images.",
+    images: ["/logo.png"],
+  },
 }
 
 export default function RootLayout({
