@@ -18,12 +18,12 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Qraft: Artistic QR Code Generator",
   description: "Create beautiful and artistic QR codes with your own images.",
-  metadataBase: new URL("https://qraft.vercel.app"),
+  metadataBase: new URL("https://qrcode-artistic.vercel.app"),
 
   openGraph: {
     title: "Qraft: Artistic QR Code Generator",
     description: "Create beautiful and artistic QR codes with your own images.",
-    url: "https://qraft.vercel.app",
+    url: "https://qrcode-artistic.vercel.app",
     siteName: "Qraft",
     images: [
       {
