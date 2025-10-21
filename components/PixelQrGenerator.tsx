@@ -31,7 +31,7 @@ export function PixelQrGenerator() {
   const [image1Preview, setImage1Preview] = useState<string>("")
   const [image1Url, setImage1Url] = useState<string>("")
   const [imageUrlInput, setImageUrlInput] = useState<string>("")
-  const scale = 48 // Fixed scale value
+  const scale = 24 // Fixed scale value
     const [isLoading, setIsLoading] = useState(false)
   const [isConvertingHeic, setIsConvertingHeic] = useState(false)
   const [heicProgress, setHeicProgress] = useState(0)
