@@ -41,7 +41,8 @@
       "WebFetch(domain:qrcode-artistic.onrender.com)",
       "WebFetch(domain:qrcode-artistic.vercel.app)",
       "mcp__playwright__browser_wait_for",
-      "mcp__playwright__browser_evaluate"
+      "mcp__playwright__browser_evaluate",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []
