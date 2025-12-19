@@ -19,6 +19,10 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
 # Copy frontend source last (changes most frequently)
 COPY . ./
 
+# Set environment variables for build
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
 # Build frontend
 RUN pnpm run build
 

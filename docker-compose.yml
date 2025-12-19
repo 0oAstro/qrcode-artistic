@@ -35,6 +35,8 @@ services:
                 - qrcode-artistic-frontend:latest
             cache_to:
                 - type=inline
+            args:
+                - NEXT_PUBLIC_API_URL=https://qraft.shauryaa.dev
         container_name: qrcode-artistic-frontend
         environment:
             - PORT=3000
