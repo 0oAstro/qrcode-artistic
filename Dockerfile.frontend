@@ -1,0 +1,37 @@
+# Frontend Dockerfile - Node.js SvelteKit SSR
+# Optimized for build cache
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install pnpm (cached unless base image changes)
+RUN npm install -g pnpm
+
+# Copy package files first (changes less frequently than source)
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
+
+# Install dependencies with cache mount
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    --mount=type=cache,target=/app/node_modules/.cache \
+    pnpm install --frozen-lockfile
+
+# Copy frontend source last (changes most frequently)
+COPY frontend/ ./
+
+# Build frontend (with cache for build artifacts)
+ENV VITE_API_URL=""
+RUN --mount=type=cache,target=/app/.svelte-kit \
+    --mount=type=cache,target=/app/frontend/.svelte-kit \
+    pnpm run build
+
+# Expose port
+EXPOSE 3000
+
+# Set environment variables for SvelteKit server
+ENV PORT=3000
+ENV HOST=0.0.0.0
+
+# Start Node.js server (adapter-node outputs to build/)
+CMD ["node", "build/index.js"]
+

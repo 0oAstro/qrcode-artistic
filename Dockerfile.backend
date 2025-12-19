@@ -1,0 +1,60 @@
+# Backend Dockerfile - Python FastAPI only
+# Optimized for build cache
+
+# ============================================
+# Stage 1: Build Python Backend
+# ============================================
+FROM python:3.13-slim AS backend-builder
+
+WORKDIR /app
+
+# Install system dependencies for Python packages (cached unless base image changes)
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements file first (changes less frequently than code)
+COPY requirements.txt ./
+
+# Install Python dependencies with cache mount
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade pip && \
+    grep -v '^-e' requirements.txt > requirements-filtered.txt && \
+    pip install --no-deps -r requirements-filtered.txt
+
+# Copy application code last (changes most frequently)
+COPY meghdoot/ ./meghdoot/
+
+# ============================================
+# Stage 2: Production Image
+# ============================================
+FROM python:3.13-slim
+
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy Python environment from builder
+COPY --from=backend-builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
+COPY --from=backend-builder /usr/local/bin /usr/local/bin
+
+# Copy application code
+COPY --from=backend-builder /app/meghdoot /app/meghdoot
+
+# Expose backend port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Start backend server
+CMD ["uvicorn", "meghdoot.research.api.server:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+
