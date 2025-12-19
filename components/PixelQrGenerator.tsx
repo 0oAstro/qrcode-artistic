@@ -42,7 +42,7 @@ export function PixelQrGenerator() {
   const [imageLoaded, setImageLoaded] = useState(false)
   const [qrContent, setQrContent] = useState("")
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null)
-  
+
   const showToast = (message: string, type: "success" | "error" = "success") => {
     setToast({ message, type })
     setTimeout(() => setToast(null), 3000)
@@ -102,7 +102,7 @@ export function PixelQrGenerator() {
 
 
 
-  
+
   const convertHeicToPng = async (file: File): Promise<File> => {
     try {
       setHeicProgress(0)
@@ -175,7 +175,7 @@ export function PixelQrGenerator() {
       }
     }
 
-  
+
     const reader = new FileReader()
     reader.onload = (e) => {
       const result = e.target?.result as string
@@ -276,7 +276,7 @@ export function PixelQrGenerator() {
         }
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://qraft.shauryaa.dev'
       console.log('API URL being used:', apiUrl)
       console.log('Full API endpoint:', `${apiUrl}/generate-qr`)
       console.log('Making API call...')
