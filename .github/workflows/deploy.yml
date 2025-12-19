@@ -1,0 +1,30 @@
+name: Deploy to Production
+
+on:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
+
+# Ensure only one deployment runs at a time
+# Cancel any in-progress deployments when a new one starts
+concurrency:
+    group: deploy-production
+    cancel-in-progress: true
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Deploy to server
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                  host: kyros.shauryaa.dev
+                  port: 6767
+                  username: root
+                  key: ${{ secrets.SSH_PRIVATE_KEY }}
+                  script: |
+                      cd /opt/docker/qrcode-artistic
+                      git fetch origin
+                      git reset --hard origin/main
+                      ./deploy.sh
