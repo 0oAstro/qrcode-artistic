@@ -39,6 +39,7 @@ services:
         environment:
             - PORT=3000
             - HOST=0.0.0.0
+            - NEXT_PUBLIC_API_URL=http://localhost:8000
         ports:
             - "127.0.0.1:3000:3000"
         restart: unless-stopped

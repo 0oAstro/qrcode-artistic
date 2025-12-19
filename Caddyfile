@@ -1,8 +1,8 @@
-# Caddyfile for Meghdoot Research
+# Caddyfile for QR Code Artistic Project
 # This file should be copied to /etc/caddy/Caddyfile on the server
-# Using ifs.shauryaa.dev subdomain
+# Using qraft.shauryaa.dev subdomain
 
-qrcode-artistic.shauryaa.dev {
+qraft.shauryaa.dev {
     # Proxy API requests to Python backend
     handle /api/* {
         reverse_proxy localhost:8000 {
