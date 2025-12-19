@@ -1,7 +1,8 @@
-import io
 import base64
-import segno
+import io
+
 import requests
+import segno
 from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -16,10 +17,13 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://qrcode-artistic.vercel.app",
+        "https://qraft.shauryaa.dev",
         "http://localhost:3000",
         "http://localhost:3001",
+        "http://localhost:4001",
         "http://127.0.0.1:3000",
-        "http://127.0.0.1:3001"
+        "http://127.0.0.1:3001",
+        "http://127.0.0.1:4001"
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],

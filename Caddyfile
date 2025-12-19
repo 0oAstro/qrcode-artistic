@@ -5,19 +5,19 @@
 qraft.shauryaa.dev {
     # Proxy API requests to Python backend
     handle /api/* {
-        reverse_proxy localhost:8000 {
+        reverse_proxy localhost:4002 {
             header_up Host {host}
         }
     }
 
     # Proxy health check to backend
     handle /health {
-        reverse_proxy localhost:8000
+        reverse_proxy localhost:4002
     }
 
     # All other requests go to Next.js frontend
     handle {
-        reverse_proxy localhost:3000 {
+        reverse_proxy localhost:4001 {
             header_up Host {host}
         }
     }
