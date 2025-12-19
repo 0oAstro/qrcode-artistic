@@ -19,10 +19,8 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
 # Copy frontend source last (changes most frequently)
 COPY . ./
 
-# Build frontend (with cache for build artifacts)
-RUN --mount=type=cache,target=/app/.next \
-    --mount=type=cache,target=/app/node_modules/.cache \
-    pnpm run build
+# Build frontend
+RUN pnpm run build
 
 # Expose port
 EXPOSE 3000
