@@ -1,52 +1,51 @@
 services:
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.backend
-      cache_from:
-        - meghdoot-backend:latest
-      cache_to:
-        - type=inline
-    container_name: meghdoot-backend
-    env_file:
-      - .env
-    environment:
-      - PYTHONUNBUFFERED=1
-    ports:
-      - "127.0.0.1:8000:8000"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    backend:
+        build:
+            context: .
+            dockerfile: Dockerfile.backend
+            cache_from:
+                - qrcode-artistic-backend:latest
+            cache_to:
+                - type=inline
+        container_name: qrcode-artistic-backend
+        env_file:
+            - .env
+        environment:
+            - PYTHONUNBUFFERED=1
+        ports:
+            - "127.0.0.1:8000:8000"
+        restart: unless-stopped
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "3"
 
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-      cache_from:
-        - meghdoot-frontend:latest
-      cache_to:
-        - type=inline
-    container_name: meghdoot-frontend
-    environment:
-      - VITE_API_URL=""
-      - PORT=3000
-      - HOST=0.0.0.0
-    ports:
-      - "127.0.0.1:3000:3000"
-    restart: unless-stopped
-    depends_on:
-      - backend
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    frontend:
+        build:
+            context: .
+            dockerfile: Dockerfile.frontend
+            cache_from:
+                - qrcode-artistic-frontend:latest
+            cache_to:
+                - type=inline
+        container_name: qrcode-artistic-frontend
+        environment:
+            - PORT=3000
+            - HOST=0.0.0.0
+        ports:
+            - "127.0.0.1:3000:3000"
+        restart: unless-stopped
+        depends_on:
+            - backend
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "3"

@@ -17,7 +17,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements file first (changes less frequently than code)
-COPY requirements.txt ./
+COPY backend/requirements.txt ./
 
 # Install Python dependencies with cache mount
 RUN --mount=type=cache,target=/root/.cache/pip \
@@ -26,7 +26,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --no-deps -r requirements-filtered.txt
 
 # Copy application code last (changes most frequently)
-COPY meghdoot/ ./meghdoot/
+COPY backend/ ./backend/
 
 # ============================================
 # Stage 2: Production Image
@@ -46,7 +46,7 @@ COPY --from=backend-builder /usr/local/lib/python3.13/site-packages /usr/local/l
 COPY --from=backend-builder /usr/local/bin /usr/local/bin
 
 # Copy application code
-COPY --from=backend-builder /app/meghdoot /app/meghdoot
+COPY --from=backend-builder /app/backend /app/backend
 
 # Expose backend port
 EXPOSE 8000
@@ -56,5 +56,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Start backend server
-CMD ["uvicorn", "meghdoot.research.api.server:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
-
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]

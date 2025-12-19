@@ -2,7 +2,7 @@
 # This file should be copied to /etc/caddy/Caddyfile on the server
 # Using ifs.shauryaa.dev subdomain
 
-ifs.shauryaa.dev {
+qrcode-artistic.shauryaa.dev {
     # Proxy API requests to Python backend
     handle /api/* {
         reverse_proxy localhost:8000 {
@@ -15,11 +15,10 @@ ifs.shauryaa.dev {
         reverse_proxy localhost:8000
     }
 
-    # All other requests go to Node.js frontend (SSR)
+    # All other requests go to Next.js frontend
     handle {
         reverse_proxy localhost:3000 {
             header_up Host {host}
         }
     }
 }
-

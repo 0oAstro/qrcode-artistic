@@ -9,7 +9,7 @@ WORKDIR /app
 RUN npm install -g pnpm
 
 # Copy package files first (changes less frequently than source)
-COPY frontend/package.json frontend/pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies with cache mount
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
@@ -17,21 +17,19 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile
 
 # Copy frontend source last (changes most frequently)
-COPY frontend/ ./
+COPY . ./
 
 # Build frontend (with cache for build artifacts)
-ENV VITE_API_URL=""
-RUN --mount=type=cache,target=/app/.svelte-kit \
-    --mount=type=cache,target=/app/frontend/.svelte-kit \
+RUN --mount=type=cache,target=/app/.next \
+    --mount=type=cache,target=/app/node_modules/.cache \
     pnpm run build
 
 # Expose port
 EXPOSE 3000
 
-# Set environment variables for SvelteKit server
+# Set environment variables for Next.js server
 ENV PORT=3000
 ENV HOST=0.0.0.0
 
-# Start Node.js server (adapter-node outputs to build/)
-CMD ["node", "build/index.js"]
-
+# Start Next.js server
+CMD ["pnpm", "start"]
