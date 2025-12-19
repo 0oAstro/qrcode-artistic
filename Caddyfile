@@ -3,8 +3,8 @@
 # Using qraft.shauryaa.dev subdomain
 
 qraft.shauryaa.dev {
-    # Proxy API requests to Python backend
-    handle /api/* {
+    # Proxy QR generation API to Python backend
+    handle /generate-qr {
         reverse_proxy localhost:4002 {
             header_up Host {host}
         }
