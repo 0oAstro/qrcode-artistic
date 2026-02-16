@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WASM QR Test</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    button {
+      background: #0070f3;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    button:hover:not(:disabled) {
+      background: #0051cc;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+    #result {
+      margin-top: 20px;
+    }
+    #result img {
+      max-width: 200px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .status {
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+    }
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .status.loading {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .log {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>WASM QR Code Test</h1>
+
+  <div class="card">
+    <h2>Status</h2>
+    <div id="status" class="status loading">Loading Pyodide...</div>
+  </div>
+
+  <div class="card">
+    <h2>Generate QR Code</h2>
+    <input type="text" id="qrUrl" placeholder="Enter URL for QR code" value="https://example.com">
+    <button id="generateBtn" disabled>Generate QR Code</button>
+    <div id="result"></div>
+  </div>
+
+  <div class="card">
+    <h2>Console Log</h2>
+    <div id="log" class="log"></div>
+  </div>
+
+  <script>
+    const PYODIDE_VERSION = "0.29.3";
+    const PYODIDE_INDEX_URL = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/`;
+
+    const statusEl = document.getElementById('status');
+    const logEl = document.getElementById('log');
+    const generateBtn = document.getElementById('generateBtn');
+    const resultEl = document.getElementById('result');
+
+    function log(message) {
+      console.log(message);
+      logEl.textContent += message + '\n';
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function setStatus(message, type) {
+      statusEl.textContent = message;
+      statusEl.className = `status ${type}`;
+    }
+
+    let pyodide = null;
+
+    async function loadPyodide() {
+      try {
+        log('Loading Pyodide from CDN: ' + PYODIDE_INDEX_URL);
+
+        const script = document.createElement('script');
+        script.src = `${PYODIDE_INDEX_URL}pyodide.js`;
+        script.async = true;
+
+        await new Promise((resolve, reject) => {
+          script.onload = resolve;
+          script.onerror = () => reject(new Error('Failed to load Pyodide script'));
+          document.head.appendChild(script);
+        });
+
+        log('Pyodide script loaded, initializing...');
+        // @ts-expect-error - loadPyodide is loaded from CDN
+        pyodide = await loadPyodide({ indexURL: PYODIDE_INDEX_URL });
+        log('Pyodide initialized, loading packages...');
+
+        await pyodide.loadPackage(['micropip', 'pillow']);
+        log('Base packages loaded');
+
+        await pyodide.runPythonAsync(`
+          import micropip
+          print("Installing segno and qrcode-artistic...")
+          await micropip.install(['segno>=1.6.6', 'qrcode-artistic>=3.0.2'])
+          print("Packages installed")
+        `);
+        log('Python packages installed');
+
+        setStatus('Pyodide Ready!', 'success');
+        generateBtn.disabled = false;
+        log('✓ Pyodide fully loaded and ready');
+      } catch (error) {
+        log('✗ Error: ' + error.message);
+        setStatus('Error loading Pyodide: ' + error.message, 'error');
+        console.error(error);
+      }
+    }
+
+    async function generateQR() {
+      if (!pyodide) {
+        log('Pyodide not loaded');
+        return;
+      }
+
+      const url = document.getElementById('qrUrl').value;
+      if (!url) {
+        log('Please enter a URL');
+        return;
+      }
+
+      try {
+        generateBtn.disabled = true;
+        log('Generating QR for: ' + url);
+        setStatus('Generating QR...', 'loading');
+
+        const result = await pyodide.runPythonAsync(`
+          import segno
+          import io
+          import base64
+
+          qr = segno.make("${url}", error='h')
+          buffer = io.BytesIO()
+          qr.save(out=buffer, kind="png", scale=8)
+          buffer.seek(0)
+          image_bytes = buffer.getvalue()
+          base64_image = base64.b64encode(image_bytes).decode('utf-8')
+          data_url = f"data:image/png;base64,{base64_image}"
+          data_url
+        `);
+
+        log('QR generated successfully!');
+        setStatus('QR Generated!', 'success');
+        resultEl.innerHTML = `<img src="${result}" alt="QR Code">`;
+      } catch (error) {
+        log('✗ Error generating QR: ' + error.message);
+        setStatus('Error: ' + error.message, 'error');
+        console.error(error);
+      } finally {
+        generateBtn.disabled = false;
+      }
+    }
+
+    generateBtn.addEventListener('click', generateQR);
+
+    // Start loading
+    loadPyodide();
+  </script>
+</body>
+</html>
