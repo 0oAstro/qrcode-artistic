@@ -1,4 +1,4 @@
-# Frontend Dockerfile - Node.js SvelteKit SSR
+# Frontend Dockerfile - Node.js Next.js
 # Optimized for build cache
 
 FROM node:20-alpine

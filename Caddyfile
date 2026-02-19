@@ -1,24 +1,6 @@
 # Caddyfile for QR Code Artistic Project
-# This file should be copied to /etc/caddy/Caddyfile on the server
-# Using qraft.shauryaa.dev subdomain
+# Coolify will handle SSL and proxying
 
 qraft.shauryaa.dev {
-    # Proxy QR generation API to Python backend
-    handle /generate-qr {
-        reverse_proxy localhost:4002 {
-            header_up Host {host}
-        }
-    }
-
-    # Proxy health check to backend
-    handle /health {
-        reverse_proxy localhost:4002
-    }
-
-    # All other requests go to Next.js frontend
-    handle {
-        reverse_proxy localhost:4001 {
-            header_up Host {host}
-        }
-    }
+    reverse_proxy localhost:3000
 }
