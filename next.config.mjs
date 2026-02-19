@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
+  trailingSlash: true,
   // Exclude pyodide from webpack bundling - it will be loaded dynamically from CDN
   webpack: (config, { isServer }) => {
     if (!isServer) {
